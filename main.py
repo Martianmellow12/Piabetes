@@ -176,7 +176,7 @@ else:
     print 'Please enter required data'
     wolfram_key = raw_input('Wolfram Alpha Key > ')
     textmagic_user = raw_input('TextMagic Username > ')
-    textmagc_key = raw_input('TextMagic Key > ')
+    textmagic_key = raw_input('TextMagic Key > ')
     fileout = open(local_dir+'api_keys.nt','w')
     fileout.write(wolfram_key+'\n'+textmagic_key+'\n'+textmagic_user+'\n')
     fileout.close()
