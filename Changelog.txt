@@ -1,0 +1,37 @@
+Changelog and Info For Piabetes
+===============================================
+
+v1.0
+	- Able to send and receive text messages necessary for data transfer
+	- Able to parse Wolfram Alpha requests using regular expressions
+	- Average response time of one minute
+	- Multiple requests can be sent in separately, and will be proccessed
+	- Whitelisting to avoid misuse of TextMagic credits
+	- Able to visually log requests for review by the admin
+	- Able to process admin requests
+		- Shutdown
+		- Restart
+		- Add number to the whitelist
+		- Remove number from the whitelist
+		- Remote updating
+		- Remote file uploading (very buggy, should be fixed in v1.1)
+	- Can process amounts and non-amounts (“grapes” vs “1 cup grapes”)
+	- Upon crashing, the message that crashed it will be deleted, and the server
+	  restarted
+
+v1.1
+	- Repaired the buggy upload command
+	- Modified CrashControl.py to send a detailed notification to the admin,
+	  containing the number of the sender, the crash-causing message, and the
+	  “Piabetes Crashed” message
+	- Added developer mode, which can be accessed from the command line by
+	  running main.py with a -d argument.
+
+v1.2
+	- Added a library function that saves previous searches to speed up
+	  response
+	- Library function is set to update at 3:00 AM on the first of each month
+	- Improved first time setup process for less experienced users, and
+	  integrated API key entry for the end use
+	- Added the ability to remotely disable and enable library updating, and
+	  to have it update manually
