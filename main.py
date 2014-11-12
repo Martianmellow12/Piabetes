@@ -30,7 +30,7 @@ credit_amount = float()
 dev_mode = False
 dev_number = str()
 
-regex_parser = '\d+ \w+( oz)?'
+regex_parser = '\d+\.?\d+? \w+( oz)?'
 regex_filename = ' ([^\s]+) '
 regex_fileurl = ' [^\s]+ (.+)$'
 regex_units = '(\d+) (\w+( oz)?) (.+)'
