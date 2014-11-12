@@ -195,8 +195,7 @@ except Exception,e:
     print 'An error ocurred with TextMagic'
     print 'Defaulting to developer mode'
     dev_mode = True
-    print 'Please note that certain functions may not work'
-    print 'Enter "help" for more details'
+    print 'Please note that certain functions may not work correctly'
     print ''
     print '----- Developer Mode -----'
     print 'Enter a number to "send" messages from'
@@ -214,8 +213,7 @@ if len(sys.argv) > 1:
     
     if sys.argv[1] == '-d' and not dev_mode == True:
         print 'Piabetes will now run in developer mode'
-        print 'Please note that certain functions may not work'
-        print 'Enter "help" for more details'
+        print 'Please note that certain functions may not work correctly'
         dev_mode = True
         print ''
         print '----- Developer Mode -----'
@@ -409,7 +407,10 @@ def parse_carbs(toparse):
     if toparse['queryresult']['@success'] == 'true':
         amount = re.search(regex_parser,toparse['queryresult']['pod'][0]['subpod']['plaintext'])
         carbs = re.search(regex_parser,toparse['queryresult']['pod'][1]['subpod']['plaintext'])
-        main = 'Qty: '+amount.group(0)+'\nCarbs: '+carbs.group(0)+'\n'
+        if not amount == None and not carbs == None:
+            main = 'Qty: '+amount.group(0)+'\nCarbs: '+carbs.group(0)+'\n'
+        else:
+            main = 'Qty: N/A\nCarbs: N/A\n'
     else:
         main = 'Data Unavailable\nCarbs: N/A\n'
         
@@ -420,7 +421,10 @@ def parse_fiber(toparse):
     
     if toparse['queryresult']['@success'] == 'true' and not 'data not available' in toparse['queryresult']['pod'][1]['subpod']['plaintext']:
         m = re.search(regex_parser,toparse['queryresult']['pod'][1]['subpod']['plaintext'])
-        main = 'Dietary Fiber: '+m.group(0)
+        if not m == None:
+            main = 'Dietary Fiber: '+m.group(0)
+        else:
+            main = 'Dietary Fiber: N/A'
     else:
         main = 'Dietary Fiber: N/A'
         
