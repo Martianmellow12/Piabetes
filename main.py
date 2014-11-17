@@ -27,6 +27,17 @@ sms_out = str()
 gpio_avail = False
 credit_amount = float()
 
+uptime_start = float()
+uptime = {
+    'seconds':int(),
+    'minutes':int(),
+    'hours':int(),
+    'days':int()
+    }
+
+bad_chars = [
+    ]
+
 dev_mode = False
 dev_number = str()
 
@@ -34,6 +45,7 @@ regex_parser = '\d+\.?\d+? \w+( oz)?'
 regex_filename = ' ([^\s]+) '
 regex_fileurl = ' [^\s]+ (.+)$'
 regex_units = '(\d+) (\w+( oz)?) (.+)'
+regex_title = '([^|]+)'
 
 do_libupdate = True
 
@@ -263,6 +275,47 @@ fileout.close()
 #
 #
 #
+#File Structure Integrity Check
+def integrity_check():
+    global local_dir
+    fail_rate = int()
+    
+    #Levels decide how important files are
+    #Level 1 - Not necessary for operation
+    #Level 2 - Features will be missing, but Piabetes can still function
+    #Level 3 - Vital, Piabetes will be nonfunctional without it
+    files = {
+        'Changelog.txt':1,
+        'textmagic':3,
+        'Config.nt':1,
+        'xmltodict.py':3,
+        'Whitelist.nt':1,
+        'Updater.py':2,
+        'api_keys.nt':3,
+        'Whitelist Backup.py':2,
+        'CrashControl.py':2,
+        'License.txt':1,
+        }
+
+    print ''
+    print '----- Filesystem Integrity Check -----'
+
+    for filename in files:
+        if os.path.isfile(local_dir+filename) or os.path.isdir(local_dir+filename):
+            print '[ ok ] '+filename
+        else:
+            print '[fail] '+filename
+            fail_rate = fail_rate+files[filename]
+
+    fail_rate = int((100/len(files))*fail_rate)
+    print 'Integrity Rating: '+str(100-fail_rate)+'%'
+    print '--------------------------------------'
+    print ''
+#
+#
+#
+#
+#
 #Timestamp Function
 def timestamp():
     return '['+str(datetime.datetime.today())+'] '
@@ -403,12 +456,14 @@ def query_fiber(food):
 #Parsing Functions
 def parse_carbs(toparse):
     global regex_parser
+    global regex_title
     
     if toparse['queryresult']['@success'] == 'true':
         amount = re.search(regex_parser,toparse['queryresult']['pod'][0]['subpod']['plaintext'])
         carbs = re.search(regex_parser,toparse['queryresult']['pod'][1]['subpod']['plaintext'])
+        title = re.search(regex_title,toparse['queryresult']['pod'][0]['subpod']['plaintext'].replace(' |','|'))
         if not amount == None and not carbs == None:
-            main = 'Qty: '+amount.group(0)+'\nCarbs: '+carbs.group(0)+'\n'
+            main = title.group(0)+'\nQty: '+amount.group(0)+'\nCarbs: '+carbs.group(0)+'\n'
         else:
             main = 'Qty: N/A\nCarbs: N/A\n'
     else:
@@ -486,6 +541,8 @@ def parse_command(toparse):
     global dev_number
     global do_libupdate
     global manual_libupdate
+    global uptime_start
+    global uptime
 
     if toparse[:12] == '--whitelist ':
         whitelist.append(toparse[12:])
@@ -579,6 +636,33 @@ def parse_command(toparse):
     if toparse == '--dolibupdate':
         print timestamp()+'The library will now be updated manually'
         update_library()
+
+    if toparse == '--uptime':
+        print timestamp()+sms_in['messages'][0]['from']+' requested the uptime'
+        if not sms_in['messages'][0]['from'] in whitelist:
+            print timestamp()+sms_in['messages'][0]['from']+' is not whitelisted'
+            return False
+        else:
+            uptime_string = str(uptime['days'])+' days\n'+str(uptime['hours'])+' hours\n'+str(uptime['minutes'])+' minutes\n'+str(uptime['seconds'])+' seconds'
+            if dev_mode:
+                print uptime_string
+            else:
+                client.send(uptime_string,sms_in['messages'][0]['from'])
+            
+            print timestamp()+sms_in['messages'][0]['from']+' whitelisted, uptime sent ('+uptime_string.replace('\n',', ')+')'
+
+    if toparse == '--integrity':
+        print timestamp()+sms_in['messages'][0]['from']+' requested an integrity check'
+
+        if dev_mode == True:
+            integrity_check()
+        else:
+            print timestamp()+'Integrity checks not available via text message'
+            if sms_in['messages'][0]['from'] in whitelist:
+                client.send('Integrity checks not available via text message',sms_in['messages'][0]['from'])
+                print timestamp()+'They have been notified of this'
+            else:
+                print timestamp()+'No matter, they\'re not whitelisted anyway'
 #
 #
 #
@@ -593,24 +677,35 @@ print timestamp()+'Created crash file'
 print timestamp()+'All exceptions after this point will be percieved as a crash'
 print timestamp()+'If endless loop occurs, unplug network cable'
 print '['+str(datetime.datetime.today())+'] Started logging data'
+uptime_start = time.time()
 
 if gpio_avail:
     power_led(1)
 
 while True:
-
-    if dev_mode:
-        request = raw_input('>')
-        sms_in = {
-            'messages':{
-                0:{
-                    'text':request,
-                    'from':dev_number
+    try:
+        if dev_mode:
+            request = raw_input('>')
+            sms_in = {
+                'messages':{
+                    0:{
+                        'text':request,
+                        'from':dev_number
+                        }
                     }
                 }
-            }
-    else:
-        sms_in = client.receive(0)
+        else:
+            sms_in = client.receive(0)
+    except Exception,e:
+        print timestamp()+'There may have been a network error'
+        print timestamp()+'Piabetes will idle until a connection is established'
+
+        while not ping():
+            time.sleep(10)
+            print timestamp()+'IDLE'
+
+        print timestamp()+'Piabetes is now back online'
+        uptime_start = time.time()
 
     if len(sms_in['messages'])>0:
         sms_in['messages'][0]['text'] = sms_in['messages'][0]['text'].lower()
@@ -658,3 +753,15 @@ while True:
     now = datetime.datetime.now()
     if int(now.day) == 1 and int(now.hour) == 3 and do_libupdate == True:
         update_library()
+
+    uptime['seconds'] = int(time.time()-uptime_start)
+    if uptime['seconds']>=60:
+        uptime['minutes'] = uptime['minutes']+1
+        uptime['seconds'] = 0
+        uptime_start = time.time()
+    if uptime['minutes']>=60:
+        uptime['hours'] = uptime['hours']+1
+        uptime['minutes'] = 0
+    if uptime['hours']>=24:
+        uptime['days'] = uptime['days']+1
+        uptime['hours'] = 0
