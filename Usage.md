@@ -4,7 +4,7 @@
   <ul>
     <li>
       <h3>Keep It Simple</h3>
-      <p>To avoid errors, keep your requests short. This means that instead of sending "how many carbs are in 12 grams of french fries?", you should simply send "12 grams french fries". This will help minimize errors that may occur when parsing your request.</p>
+      <p>To avoid errors, keep your requests short. This means that instead of sending "how many carbs are in 12 grams of french fries?", you should simply send "12 grams:french fries". This will help minimize errors that may occur when parsing your request.</p>
     </li>
     <li>
       <h3>Send Brand Names</h3>
@@ -12,7 +12,7 @@
     </li>
     <li>
       <h3>Send Amounts</h3>
-      <p>Piabetes will automatically find the correct carb and dietary fiber count for an amount you text. The amount should come before the food in the text, and should include units, such as "1 cup milk", or "12 grams bread". Please notice that none of the requests say "1 cup <i>of</i> milk". The <i>of</i> is omitted to minimize errors, and raise the chance that Piabetes will correctly interpret the request.</p>
+      <p>Piabetes will automatically find the correct carb and dietary fiber count for an amount you text. The amount should come before the food in the text, and should include units, such as "1 cup:milk", or "12 grams:bread". You should also include a colon, or a `:` between the amount and the food, as can be seen in the example. Please notice that none of the requests say "1 cup <i>of</i> milk". The <i>of</i> is omitted to minimize errors, and raise the chance that Piabetes will correctly interpret the request.</p>
     </li>
     <li>
       <h3>Don't Worry About Capitalization</h3>
