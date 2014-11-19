@@ -1,6 +1,6 @@
 #Piabetes Updater Script
 #Used to update Piabetes from a remote location
-#Written By Michael Kersting
+#Written By Michael Kersting Jr.
 import sys
 import os
 from os import system

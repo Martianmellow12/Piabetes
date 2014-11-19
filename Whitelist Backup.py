@@ -1,6 +1,6 @@
 #Piabetes Whitelist Backup Script
 #Should Be Run BEFORE Piabetes and Update Script
-#Written By Michael Kersting
+#Written By Michael Kersting Jr.
 import os
 from os import system
 import sys

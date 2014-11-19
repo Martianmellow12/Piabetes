@@ -35,3 +35,21 @@ v1.2
 	  integrated API key entry for the end use
 	- Added the ability to remotely disable and enable library updating, and
 	  to have it update manually
+
+v1.3
+	- Fixed regex that would exclude decimals, converting 1.90 into 90
+	- Added integrity checking to verify that the files crucial to Piabetes
+	  are intact. (Developer mode only)
+	- Added a timer to check for uptime (time connected to the internet) so
+	  that troubleshooting in the future may be a little bit easier for me
+	- Modified the library to also store food names (such as brands)
+	- Added documentation of the modules required for Piabetes
+
+v1.4
+	- Rewrote the four query and parsing functions into one function
+	- Fixed errors with the regex not parsing information correctly
+	- Added implementation of a library for Wolfram Alpha to make data
+	  more accurate
+	- Removed the xmltodict library and it’s dependencies
+	- Added an —addlib command to manually add foods via developer mode
+	- Added a —flush lib command to clear out all library entries

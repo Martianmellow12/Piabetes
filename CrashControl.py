@@ -1,6 +1,6 @@
 #Crash Control Script
 #Reboots The Computer If A Crash (in Piabetes) Occurs
-#Written By Michael Kersting
+#Written By Michael Kersting Jr.
 import os
 from os import system
 import sys

@@ -1,23 +1,21 @@
 #Piabetes Server
 #A Service For The Retreival Of Nutritional Information
-#Written By Michael Kersting
-#xmltodict Courtesy Of Martin Blech
+#Written By Michael Kersting Jr.
 import os
 from os import system
 import sys
 import textmagic.client
 import datetime
 import urllib2
-import xmltodict
+import wolframalpha as wolf
 import time
 import re
-import time
 
 whitelist = ['17042306940']
 mode = 'b'
 local_dir = str(os.getcwd())+'/'
 now = datetime.datetime.now()
-version = 'v1.2'
+version = 'v1.4'
 online = False
 wolfram_key = str()
 textmagic_key = str()
@@ -35,9 +33,6 @@ uptime = {
     'days':int()
     }
 
-bad_chars = [
-    ]
-
 dev_mode = False
 dev_number = str()
 
@@ -46,6 +41,8 @@ regex_filename = ' ([^\s]+) '
 regex_fileurl = ' [^\s]+ (.+)$'
 regex_units = '(\d+) (\w+( oz)?) (.+)'
 regex_title = '([^|]+)'
+regex_qty = '\d+\.?\d+? \w+ ?( oz)?'
+query_regex = '([^:]*):([^:]+)'
 
 do_libupdate = True
 
@@ -288,7 +285,7 @@ def integrity_check():
         'Changelog.txt':1,
         'textmagic':3,
         'Config.nt':1,
-        'xmltodict.py':3,
+        'wolframalpha':3,
         'Whitelist.nt':1,
         'Updater.py':2,
         'api_keys.nt':3,
@@ -434,56 +431,44 @@ def power_led(state):
 #
 #
 #
-#Query Functions
-def query_carbs(food):
+#Query Function
+def query(food):
     global wolfram_key
-    
-    query_url = 'http://api.wolframalpha.com/v2/query?appid='+wolfram_key+'&input='+reformat('carbs '+str(food))+'&format=plaintext'
-    response = urllib2.urlopen(query_url).read()
-    return xmltodict.parse(response)
+    global query_regex
 
-def query_fiber(food):
-    global wolfram_key
+    #Check For Misentries
+    if not ':' in food:
+        food = ':'+food
 
-    query_url = 'http://api.wolframalpha.com/v2/query?appid='+wolfram_key+'&input='+reformat('dietary fiber '+str(food))+'&format=plaintext'
-    response = urllib2.urlopen(query_url).read()
-    return xmltodict.parse(response)
-#
-#
-#
-#
-#
-#Parsing Functions
-def parse_carbs(toparse):
-    global regex_parser
-    global regex_title
+    parsed_request = re.search(query_regex,food)
+    qty = parsed_request.group(1)
+    food_name = parsed_request.group(2)
+    wc = wolf.Client(wolfram_key)
     
-    if toparse['queryresult']['@success'] == 'true':
-        amount = re.search(regex_parser,toparse['queryresult']['pod'][0]['subpod']['plaintext'])
-        carbs = re.search(regex_parser,toparse['queryresult']['pod'][1]['subpod']['plaintext'])
-        title = re.search(regex_title,toparse['queryresult']['pod'][0]['subpod']['plaintext'].replace(' |','|'))
-        if not amount == None and not carbs == None:
-            main = title.group(0)+'\nQty: '+amount.group(0)+'\nCarbs: '+carbs.group(0)+'\n'
-        else:
-            main = 'Qty: N/A\nCarbs: N/A\n'
-    else:
-        main = 'Data Unavailable\nCarbs: N/A\n'
-        
-    return main
+    response = wc.query('carbs in '+qty+' '+food_name)
+    #Modify For Carb Info Discrepancies
+    try:
+        carbs = response.pods[1].text
+    except Exception:
+        carbs = 'N/A'
+    if '|' in carbs:
+        carbs = 'N/A'
 
-def parse_fiber(toparse):
-    global regex_parser
-    
-    if toparse['queryresult']['@success'] == 'true' and not 'data not available' in toparse['queryresult']['pod'][1]['subpod']['plaintext']:
-        m = re.search(regex_parser,toparse['queryresult']['pod'][1]['subpod']['plaintext'])
-        if not m == None:
-            main = 'Dietary Fiber: '+m.group(0)
-        else:
-            main = 'Dietary Fiber: N/A'
-    else:
-        main = 'Dietary Fiber: N/A'
-        
-    return main
+    response = wc.query('dietary fiber in '+qty+' '+food_name)
+    #Modify For Dietary Fiber Info Discrepancies
+    try:
+        fiber = response.pods[1].text
+    except Exception:
+        fiber = 'N/A'
+    if '|' in fiber:
+        fiber = 'N\A'
+
+    #Modify Qty Label For Blank Return
+    if qty == '':
+        qty = 'N/A'
+
+    final_response = food_name+'\n'+'Qty: '+qty+'\n'+'Carbs: '+carbs+'\n'+'Diatery Fiber: '+fiber
+    return final_response
 #
 #
 #
@@ -501,8 +486,7 @@ def update_library():
 
     lib_files = os.listdir(local_dir+'Library')
     est_time = time.time()
-    query_carbs('cake')
-    query_fiber('cake')
+    query('cake')
     est_time = int(time.time()-est_time)
     est_time = est_time*len(lib_files)
     est_time = est_time/60
@@ -513,7 +497,7 @@ def update_library():
         if not filename[:1] == '.':
             os.remove(local_dir+'Library/'+filename)
             fileout = open(local_dir+'Library/'+filename,'w')
-            response = parse_carbs(query_carbs(filename))+parse_fiber(query_fiber(filename))
+            response = query(filename)
             fileout.write(response)
             fileout.close()
             print '[UPDATED] '+filename
@@ -623,6 +607,8 @@ def parse_command(toparse):
     if toparse == '--exit':
         os.remove(local_dir+'crashcom.nt')
         print timestamp()+'Exit request received - Quitting...'
+        if not dev_mode:
+            client.delete_reply(int(sms_in['messages'][0]['message_id']))
         sys.exit(0)
 
     if toparse == '--nolibupdate':
@@ -663,6 +649,43 @@ def parse_command(toparse):
                 print timestamp()+'They have been notified of this'
             else:
                 print timestamp()+'No matter, they\'re not whitelisted anyway'
+
+    if toparse == '--flushlib':
+        print timestamp()+sms_in['messages'][0]['from']+' requested a library flush'
+
+        if sms_in['messages'][0]['from'] in whitelist:
+            print timestamp()+'Authenticated '+sms_in['messages'][0]['from']+' with the whitelist'
+            print timestamp()+'Flushing the library...',
+            if not os.path.isdir(local_dir+'Library'):
+                print 'Failed'
+            else:
+                lib_files = os.listdir(local_dir+'Library')
+                for filename in lib_files:
+                    if not filename[:1] == '.':
+                        os.remove(local_dir+'Library/'+filename)
+                print 'Done'
+                print timestamp()+'The library was successfully flushed'
+
+    if toparse == '--addlib':
+        print timestamp()+sms_in['messages'][0]['from']+' requested a manual addition to the library'
+        if not sms_in['messages'][0]['from'] in whitelist:
+            print timestamp()+sms_in['messages'][0]['from']+' is not on the whitelist'
+            return
+        if not dev_mode:
+            print timestamp()+'Library additions are not allowed via text message'
+            client.send('Library additions cannot be made via text message',sms_in['messages'][0]['from'])
+        name = raw_input('Name of food: ')
+        amount = raw_input('Quantity of food: ')
+        carbs = raw_input('Carbs in amount given: ')
+        fiber = raw_input('Dietary fiber in amount given: ')
+        try:
+            fileout = open(local_dir+'Library/'+str(amount)+':'+str(name),'w')
+        except:
+            print 'Error occured when attempting to open the file'
+            return
+        fileout.write(name+'\nQty: '+str(amount)+'\nCarbs: '+str(carbs)+'\nDietary Fiber: '+str(fiber))
+        fileout.close()
+        print timestamp()+'Library file successfully created'
 #
 #
 #
@@ -723,7 +746,7 @@ while True:
                 filein.close
             else:
                 print timestamp()+'No library file found - Looking up data'
-                response = parse_carbs(query_carbs(request))+parse_fiber(query_fiber(request))
+                response = query(request)
                 fileout = open(local_dir+'Library/'+request,'w')
                 fileout.write(response)
                 fileout.close()
