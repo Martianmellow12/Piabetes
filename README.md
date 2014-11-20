@@ -14,7 +14,7 @@ Piabetes sends several pieces of useful information back whenever you request a 
     </li>
     <li>
       <h3>The Quantity</h3>
-      <p>This is the quantity for the information returned. 30 grams of grapes will likely contain more carbs than just 10 grams, and the amount you're looking for can be requested specifically (check <a href = "https://github.com/Martianmellow12/Piabetes/blob/master/Usage.md#send-amounts">this</a> part of the usage page for details). If you do not send a specific quantity, this value may vary from food to food, though the information related to it (carbs, dietary fiber) will be accurate for the quantity. If an "N/A" is received, a specific quantity was most likely omitted, and the food you requested most likely has variable size, such as a fruit. To fix this, enter a quantity, such as "12 gram banana", or "0.4 lb apple".</p>
+      <p>This is the quantity for the information returned. 30 grams of grapes will likely contain more carbs than just 10 grams, and the amount you're looking for can be requested specifically (check <a href = "https://github.com/Martianmellow12/Piabetes/blob/master/Usage.md#send-amounts">this</a> part of the usage page for details). If you do not send a specific quantity, this value may vary from food to food, though the information related to it (carbs, dietary fiber) will be accurate for the quantity. If an "N/A" is received, a specific quantity was most likely omitted, and the food you requested most likely has variable size, such as a fruit. To fix this, enter a quantity, such as "12 gram:banana", or "0.4 lb:apple".</p>
     </li>
     <li>
       <h3>The Carbs</h3>
