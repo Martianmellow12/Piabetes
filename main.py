@@ -467,7 +467,7 @@ def query(food):
     if qty == '':
         qty = 'N/A'
 
-    final_response = food_name+'\n'+'Qty: '+qty+'\n'+'Carbs: '+carbs+'\n'+'Dietery Fiber: '+fiber
+    final_response = food_name+'\n'+'Qty: '+qty+'\n'+'Carbs: '+carbs+'\n'+'Diatery Fiber: '+fiber
     return final_response
 #
 #
