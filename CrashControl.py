@@ -6,13 +6,13 @@ from os import system
 import sys
 import textmagic.client
 
-local_dir = os.getcwd()
+local_dir = os.getcwd()+'/'
 local_dir = local_dir.replace('//','/')
 textmagic_user = str()
 textmagic_key = str()
 keys = []
 
-apifile = open(local_dir+'/api_keys.nt')
+apifile = open(local_dir+'api_keys.nt')
 keys = apifile.readlines()
 apifile.close()
 textmagic_user = keys[2].rstrip('\n')

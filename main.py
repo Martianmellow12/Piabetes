@@ -15,7 +15,8 @@ whitelist = ['17042306940']
 mode = 'b'
 local_dir = str(os.getcwd())+'/'
 now = datetime.datetime.now()
-version = 'v1.4'
+version = 'v1.5'
+version_name = 'Hedgehog'
 online = False
 wolfram_key = str()
 textmagic_key = str()
@@ -137,7 +138,7 @@ if not os.path.isdir(local_dir+'Library'):
 #
 #
 #First Time Setup
-if not os.path.isfile(local_dir+'Config.nt'):
+if not os.path.isfile(local_dir+'config.nt'):
     print ''
     print '------ Piabetes Server First Time Setup ------'
     print 'This is the first time setup for the Piabetes'
@@ -146,7 +147,7 @@ if not os.path.isfile(local_dir+'Config.nt'):
     print ''
     print 'Creating config file...',
 
-    fileout = open(local_dir+'Config.nt','w')
+    fileout = open(local_dir+'config.nt','w')
     fileout.write(str(datetime.datetime.today())+'\n')
     fileout.write(version+'\n')
     fileout.close()
@@ -237,7 +238,7 @@ if len(sys.argv) > 1:
 #
 #
 #Config File Validation And Updating
-fileout = open(local_dir+'Config.nt','w')
+fileout = open(local_dir+'config.nt','w')
 fileout.write(str(datetime.datetime.today())+'\n')
 fileout.write(version+'\n')
 fileout.close()
@@ -263,7 +264,7 @@ else:
 #
 #
 #Update Config File
-fileout = open(local_dir+'Config.nt','w')
+fileout = open(local_dir+'config.nt','w')
 fileout.write(str(datetime.datetime.today())+'\n')
 fileout.write(version+'\n')
 fileout.close()
@@ -284,7 +285,7 @@ def integrity_check():
     files = {
         'Changelog.txt':1,
         'textmagic':3,
-        'Config.nt':1,
+        'config.nt':1,
         'wolframalpha':3,
         'Whitelist.nt':1,
         'Updater.py':2,
@@ -467,7 +468,7 @@ def query(food):
     if qty == '':
         qty = 'N/A'
 
-    final_response = food_name+'\n'+'Qty: '+qty+'\n'+'Carbs: '+carbs+'\n'+'Dietery Fiber: '+fiber
+    final_response = food_name+'\n'+'Qty: '+qty+'\n'+'Carbs: '+carbs+'\n'+'Dietary Fiber: '+fiber
     return final_response
 #
 #
@@ -692,99 +693,102 @@ def parse_command(toparse):
 #
 #
 #Main Program
-print 'Piabetes Data Log'
-print '-------------------------------------------------'
-filein = open(local_dir+'crashcom.nt','w')
-filein.close()
-print timestamp()+'Created crash file'
-print timestamp()+'All exceptions after this point will be percieved as a crash'
-print timestamp()+'If endless loop occurs, unplug network cable'
-print '['+str(datetime.datetime.today())+'] Started logging data'
-uptime_start = time.time()
+try:
+    print 'Piabetes Data Log'
+    print '-------------------------------------------------'
+    filein = open(local_dir+'crashcom.nt','w')
+    filein.close()
+    print timestamp()+'Created crash file'
+    print timestamp()+'All exceptions after this point will be percieved as a crash'
+    print timestamp()+'If endless loop occurs, unplug network cable'
+    print '['+str(datetime.datetime.today())+'] Started logging data'
+    uptime_start = time.time()
 
-if gpio_avail:
-    power_led(1)
+    if gpio_avail:
+        power_led(1)
 
-while True:
-    try:
-        if dev_mode:
-            request = raw_input('>')
-            sms_in = {
-                'messages':{
-                    0:{
-                        'text':request,
-                        'from':dev_number
+    while True:
+        try:
+            if dev_mode:
+                request = raw_input('>')
+                sms_in = {
+                    'messages':{
+                        0:{
+                            'text':request,
+                            'from':dev_number
+                            }
                         }
                     }
-                }
-        else:
-            sms_in = client.receive(0)
-    except Exception,e:
-        print timestamp()+'There may have been a network error'
-        print timestamp()+'Piabetes will idle until a connection is established'
-
-        while not ping():
-            time.sleep(10)
-            print timestamp()+'IDLE'
-
-        print timestamp()+'Piabetes is now back online'
-        uptime_start = time.time()
-
-    if len(sms_in['messages'])>0:
-        sms_in['messages'][0]['text'] = sms_in['messages'][0]['text'].lower()
-        if gpio_avail:
-            processing_led(1)
-        request = str(sms_in['messages'][0]['text'])
-        print timestamp()+str(sms_in['messages'][0]['from'])+' requested info on '+request
-
-        if str(sms_in['messages'][0]['from']) in whitelist and not str(sms_in['messages'][0]['text'])[:2] == '--':
-            print timestamp()+str(sms_in['messages'][0]['from'])+' is on the whitelist'
-            if os.path.isfile(local_dir+'Library/'+request):
-                print timestamp()+'Library file found - Sending from memory'
-                filein = open(local_dir+'Library/'+request,'r')
-                response = filein.read()
-                filein.close
             else:
-                print timestamp()+'No library file found - Looking up data'
-                response = query(request)
-                fileout = open(local_dir+'Library/'+request,'w')
-                fileout.write(response)
-                fileout.close()
+                sms_in = client.receive(0)
+        except Exception,e:
+            print timestamp()+'There may have been a network error'
+            print timestamp()+'Piabetes will idle until a connection is established'
+    
+            while not ping():
+                time.sleep(10)
+                print timestamp()+'IDLE'
 
-            if dev_mode:
-                print response
-            else:
-                try:
-                    client.send(response,sms_in['messages'][0]['from'])
-                except Exception,e:
-                    print timestamp()+str(e)
+            print timestamp()+'Piabetes is now back online'
+            uptime_start = time.time()
+    
+        if len(sms_in['messages'])>0:
+            sms_in['messages'][0]['text'] = sms_in['messages'][0]['text'].lower()
+            if gpio_avail:
+                processing_led(1)
+            request = str(sms_in['messages'][0]['text'])
+            print timestamp()+str(sms_in['messages'][0]['from'])+' requested info on '+request
+    
+            if str(sms_in['messages'][0]['from']) in whitelist and not str(sms_in['messages'][0]['text'])[:2] == '--':
+                print timestamp()+str(sms_in['messages'][0]['from'])+' is on the whitelist'
+                if os.path.isfile(local_dir+'Library/'+request):
+                    print timestamp()+'Library file found - Sending from memory'
+                    filein = open(local_dir+'Library/'+request,'r')
+                    response = filein.read()
+                    filein.close
                 else:
-                    print '['+str(datetime.datetime.today())+'] Sent response to '+str(sms_in['messages'][0]['from'])
-
-        elif not str(sms_in['messages'][0]['from']) in whitelist and not str(sms_in['messages'][0]['text'])[:2] == '--':
-            print timestamp()+str(sms_in['messages'][0]['from'])+' is not on the whitelist'
-        else:
-            print timestamp()+'Received command: '+request
-            parse_command(request)
-            
-        if not dev_mode:
-            client.delete_reply(int(sms_in['messages'][0]['message_id']))
-
-        if gpio_avail:
-            processing_led(0)
-
-    now = datetime.datetime.now()
-    if int(now.day) == 1 and int(now.hour) == 3 and do_libupdate == True:
-        update_library()
-
-    uptime['seconds'] = int(time.time()-uptime_start)
-    if uptime['seconds']>=60:
-        uptime['minutes'] = uptime['minutes']+1
-        uptime['seconds'] = 0
-        uptime_start = time.time()
-    if uptime['minutes']>=60:
-        uptime['hours'] = uptime['hours']+1
-        uptime['minutes'] = 0
-    if uptime['hours']>=24:
-        uptime['days'] = uptime['days']+1
-        uptime['hours'] = 0
+                    print timestamp()+'No library file found - Looking up data'
+                    response = query(request)
+                    fileout = open(local_dir+'Library/'+request,'w')
+                    fileout.write(response)
+                    fileout.close()
+    
+                if dev_mode:
+                    print response
+                else:
+                    try:
+                        client.send(response,sms_in['messages'][0]['from'])
+                    except Exception,e:
+                        print timestamp()+str(e)
+                    else:
+                        print '['+str(datetime.datetime.today())+'] Sent response to '+str(sms_in['messages'][0]['from'])
+    
+            elif not str(sms_in['messages'][0]['from']) in whitelist and not str(sms_in['messages'][0]['text'])[:2] == '--':
+                print timestamp()+str(sms_in['messages'][0]['from'])+' is not on the whitelist'
+            else:
+                print timestamp()+'Received command: '+request
+                parse_command(request)
+                
+            if not dev_mode:
+                client.delete_reply(int(sms_in['messages'][0]['message_id']))
+    
+            if gpio_avail:
+                processing_led(0)
+    
+        now = datetime.datetime.now()
+        if int(now.day) == 1 and int(now.hour) == 3 and do_libupdate == True:
+            update_library()
+    
+        uptime['seconds'] = int(time.time()-uptime_start)
+        if uptime['seconds']>=60:
+            uptime['minutes'] = uptime['minutes']+1
+            uptime['seconds'] = 0
+            uptime_start = time.time()
+        if uptime['minutes']>=60:
+            uptime['hours'] = uptime['hours']+1
+            uptime['minutes'] = 0
+        if uptime['hours']>=24:
+            uptime['days'] = uptime['days']+1
+            uptime['hours'] = 0
+except:
+    print 'A fatal exception ocurred'
