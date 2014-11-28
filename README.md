@@ -28,6 +28,6 @@ Piabetes sends several pieces of useful information back whenever you request a 
 </p>
 <h3>Information Retreival Speed</h3>
 <p>Retreiving the information from Wolfram Alpha can take some time, even on a fast internet connection. This, combined with the speed of sending texts, can start to slow down the exchange. To combat this, I have Piabetes store all requests for later use, which cuts down the Wolfram request time from 12 seconds to less than 1 second. While theres nothing I can do about texting speed, Piabetes is written to treat TextMagic as a sort of queue. You can send 10 messages to Piabetes before receiving information for the first, and you'll receive info on them all around the same time.<br>
-Current Response Time: <b>01:46.2</b><br>
-Current Response Time With Library File: <b>1:34.1</b><br>
+Current Response Time: <b>33 seconds</b><br>
+Current Response Time With Library File: <b>18 seconds</b><br>
 The speeds will continue to be improved as new versions are optimized and released</p>
