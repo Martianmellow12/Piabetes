@@ -19,6 +19,7 @@ textmagic_user = keys[2].rstrip('\n')
 textmagic_key = keys[1].rstrip('\n')
 
 client = textmagic.client.TextMagicClient(textmagic_user,textmagic_key)
+print textmagic_user+" | "+textmagic_key
 #
 #
 #
@@ -32,13 +33,18 @@ if os.path.isfile(local_dir+'crashcom.nt'):
     print 'Deleting file...',
     os.remove(local_dir+'crashcom.nt')
     print 'Done'
-    print 'Notifying Michael of the crash...',
 
+    print 'Receiving data from TextMagic...',
     sms_in = client.receive(0)
+    print 'Done'
+    
+    print 'Notifying Michael of the crash...',
+    
     try:
-        client.send('17042306940','Piabetes crashed | '+str(sms_in['messages'][0]['from'])+' | '+str(sms_in['messages'][0]['text']))
-    except Exception:
+        client.send('Piabetes crashed | '+str(sms_in['messages'][0]['from'])+' | "'+str(sms_in['messages'][0]['text'])+'"','17042306940')
+    except Exception,exc:
         print 'Failed'
+        print 'Reason: '+str(exc)
     else:
         print 'Done'
 
