@@ -15,7 +15,7 @@ whitelist = ['17042306940']
 mode = 'b'
 local_dir = str(os.getcwd())+'/'
 now = datetime.datetime.now()
-version = 'v1.51'
+version = 'v1.52'
 version_name = 'Hedgehog'
 online = False
 wolfram_key = str()
@@ -110,7 +110,7 @@ def ping():
     try:
         response=urllib2.urlopen('https://www.google.com',timeout=1)
         return True
-    except urllib2.URLError as err:
+    except:
         return False
 #
 #
@@ -722,15 +722,10 @@ try:
             else:
                 sms_in = client.receive(0)
         except Exception,e:
-            print timestamp()+'There may have been a network error'
-            print timestamp()+'Piabetes will idle until a connection is established'
-    
-            while not ping():
-                time.sleep(10)
-                print timestamp()+'IDLE'
-
-            print timestamp()+'Piabetes is now back online'
-            uptime_start = time.time()
+            print timestamp()+'Piabetes was unable to retrieve any messages'
+            print timestamp()+'Reason: '+str(e)
+            print timestamp()+'Piabetes will halt for 10 seconds, and then resume standard function'
+            time.sleep(10)
     
         if len(sms_in['messages'])>0:
             sms_in['messages'][0]['text'] = sms_in['messages'][0]['text'].lower()

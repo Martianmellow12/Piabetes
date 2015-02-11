@@ -11,11 +11,23 @@ import re
 import json
 import shutil
 import zipfile
+import platform
 
-local_dir = str(os.getcwd())+'/'
+if platform.system() == 'Windows':
+    local_dir = str(os.getcwd())+'\\'
+else:
+    local_dir = str(os.getcwd())+'/'
+print local_dir
+
+safelist = [
+    'Library',
+    'Whitelist Backup'
+    'config.nt',
+    'Whitelist.nt',
+    'api_keys.nt'
+    ]
 
 do_update = True
-local_dir = local_dir.replace('//','/')
 info_url = 'http://piabetes.weebly.com/uploads/9/2/1/4/9214413/info.txt'
 update_file_regex = '^[^\.]\.upd$'
 #
@@ -26,42 +38,31 @@ update_file_regex = '^[^\.]\.upd$'
 #Update Piabetes Function
 def update_piabetes(info):
     global local_version
+    global local_dir
+    global safelist
     
     print 'Piabetes will now be updated to version '+str(info[0])
     print 'Please don\'t power off the computer until the update is complete'
     print ''
-    
-    #Backup all user-specific files
-    print 'Backing up user-specific data...',
-    if os.path.isfile(local_dir+'Whitelist.nt'):
-        filein = open(local_dir+'Whitelist.nt','r')
-        whitelist_contents = filein.read()
-        filein.close()
-    if os.path.isfile(local_dir+'config.nt'):
-        filein = open(local_dir+'config.nt','r')
-        config_contents = filein.read()
-        filein.close()
-    if os.path.isfile(local_dir+'api_keys.nt'):
-        filein = open(local_dir+'api_keys.nt','r')
-        api_contents = filein.read()
-        filein.close()
-    print 'Done'
 
     #Delete all old data
     print 'Deleting all info for v'+str(local_version)+'...',
+    print local_dir
     files = os.listdir(local_dir)
     for i in files:
-        if os.path.isfile(local_dir+i):
+        print local_dir+i
+        if os.path.isfile(local_dir+i) and not i in safelist:
             os.remove(local_dir+i)
-        if os.path.isdir(local_dir+i):
+        if os.path.isdir(local_dir+i) and not 'Library' in i and not 'Whitelist Backup' in i:
             shutil.rmtree(local_dir+i)
     print 'Done'
 
     #Download and unpack the new version
-    print 'Donwloading v'+str(info[0])+'...',
+    print 'Downloading v'+str(info[0])+'...',
     try:
-        fileout = open(local_dir+'Piabetes.zip','w')
-        fileout.write(urllib2.urlopen(info[1]).read())
+        response = urllib2.urlopen(info[1])
+        fileout = open(local_dir+'Piabetes.zip','wb')
+        fileout.write(response.read())
         fileout.close()
     except:
         print 'Failed'
@@ -71,24 +72,11 @@ def update_piabetes(info):
 
     print 'Unpacking...',
     zipped = zipfile.PyZipFile(local_dir+'Piabetes.zip')
-    zipped.extractall()
+    zipped.extractall(local_dir)
     zipped.close()
     print 'Done'
     os.remove(local_dir+'Piabetes.zip')
     print 'Deleted zipped package'
-
-    #Replace user-specific files
-    print 'Replacing user-specific data...',
-    fileout = open(local_dir+'Whitelist.nt','w')
-    fileout.write(whitelist_contents)
-    fileout.close()
-    fileout = open(local_dir+'config.nt','w')
-    fileout.write(config_contents)
-    fileout.close()
-    fileout = open(local_dir+'api_keys.nt','w')
-    fileout.write(api_contents)
-    fileout.close()
-    print 'Done'
 
     print 'Update Complete'
     print '------------------------------'
@@ -116,7 +104,7 @@ local_version = local_version[1].replace('\n','')
 local_version = float(local_version.replace('v',''))
 
 if local_version == remote_version:
-    print 'No update found'
+    print 'Piabetes is up to date'
     sys.exit(0)
 
 print 'An update was found for Piabetes'
@@ -127,23 +115,5 @@ print 'menu, or Piabetes will continue in 5 seconds.'
 if do_update  == False:
     sys.exit(0)
 
-print ''
-print '----- Piabetes Update Menu -----'
-print '[1] Update to v'+str(remote_version)
-print '[2] Exit update menu'
 
-
-try:
-    selection = int(raw_input('> '))
-except:
-    print 'An exception ocurred: you probably entered an option incorrectly'
-    sys.exit(0)
-
-if selection == 1:
-    update_piabetes(update_info)
-
-if selection == 2:
-    print 'Quitting update utility'
-    print '----------------------------'
-    print ''
-    sys.exit(0)
+update_piabetes(update_info)

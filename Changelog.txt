@@ -60,3 +60,10 @@ v1.5 (Hedgehog)
 	- New auto-updater that will be used to update to future versions
 	- CrashControl.py is now actually functional, due to better exception
 	  handling in main.py
+
+v1.51 (Hedgehog)
+	- Fixed the notifier in the crash controller
+
+v1.52 (Hedgehog)
+	- Fixed the freezing issue after disconnection
+	- Added CrashController.py handling for internal errors

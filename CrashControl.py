@@ -5,6 +5,7 @@ import os
 from os import system
 import sys
 import textmagic.client
+import time
 
 local_dir = os.getcwd()+'/'
 local_dir = local_dir.replace('//','/')
@@ -34,19 +35,29 @@ if os.path.isfile(local_dir+'crashcom.nt'):
     os.remove(local_dir+'crashcom.nt')
     print 'Done'
 
-    print 'Receiving data from TextMagic...',
-    sms_in = client.receive(0)
-    print 'Done'
+    while True:
+        print 'Receiving data from TextMagic...',
+        try:
+            sms_in = client.receive(0)
+        except:
+            print 'Failed'
+        else:
+            print 'Done'
     
-    print 'Notifying Michael of the crash...',
-    
-    try:
-        client.send('Piabetes crashed | '+str(sms_in['messages'][0]['from'])+' | "'+str(sms_in['messages'][0]['text'])+'"','17042306940')
-    except Exception,exc:
-        print 'Failed'
-        print 'Reason: '+str(exc)
-    else:
-        print 'Done'
+        print 'Notifying Michael of the crash...',
+        try:
+            info = str(sms_in['messages'][0]['from'])+' | "'+str(sms_in['messages'][0]['text'])+'"'
+        except:
+            info = 'Internal Issues'
+        try:
+            client.send('Piabetes crashed | '+info,'17042306940')
+        except Exception,exc:
+            print 'Failed'
+            print 'Reason: '+str(exc)
+            time.sleep(10)
+        else:
+            print 'Done'
+            break
 
     print 'Deleting message that made Piabetes crash...'
     if len(sms_in['messages'])>0:
