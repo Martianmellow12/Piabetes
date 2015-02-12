@@ -31,3 +31,11 @@ Piabetes sends several pieces of useful information back whenever you request a 
 Current Response Time: <b>33 seconds</b><br>
 Current Response Time With Library File: <b>18 seconds</b><br>
 The speeds will continue to be improved as new versions are optimized and released</p>
+<h3>Special Thanks</h3>
+<p>I'd like to thank a few people, without whom this project would have died back at v1.0</p>
+<ul>
+  <li>Tom Dubick, for introducing me to Python and the Raspberry Pi, and for mentoring me in all things code</li>
+  <li>Matthew "Oscar" Kersting, my little brother and inspiration for this project</li>
+  <li>Dominick Pulsone, who tested the software for me even though it was useless to him (he was the reason I redesigned the query function to work more efficiently)</li>
+</ul>
+<p>Without these people, Piabetes would just be some unfinished code taking up space on my hard drive</p>
