@@ -15,7 +15,7 @@ whitelist = ['17042306940']
 mode = 'b'
 local_dir = str(os.getcwd())+'/'
 now = datetime.datetime.now()
-version = 'v1.52'
+version = 'v1.53'
 version_name = 'Hedgehog'
 online = False
 wolfram_key = str()
@@ -475,6 +475,23 @@ def query(food):
 #
 #
 #
+#Checking For A Bad Request
+def bad_request(request):
+    if not ':' in request:
+        print timestamp()+'User made a bad request: Missing colon (:)'
+        return 'Please seperate amount and food with a :'
+    if request[:1] == ':':
+        print timestamp()+'User made a bad request: No amount specified'
+        return 'Please specify an amount left of the colon'
+    if request[len(request)-1:] == ':':
+        print timestamp()+'User made a bad request: No food specified'
+        return 'Please specify a food right of the colon'
+    return False
+#
+#
+#
+#
+#
 #Library Updating Function And Management
 def update_library():
     global local_dir
@@ -736,17 +753,19 @@ try:
     
             if str(sms_in['messages'][0]['from']) in whitelist and not str(sms_in['messages'][0]['text'])[:2] == '--':
                 print timestamp()+str(sms_in['messages'][0]['from'])+' is on the whitelist'
-                if os.path.isfile(local_dir+'Library/'+request):
+                if os.path.isfile(local_dir+'Library/'+request) and not bad_request(request):
                     print timestamp()+'Library file found - Sending from memory'
                     filein = open(local_dir+'Library/'+request,'r')
                     response = filein.read()
                     filein.close
-                else:
+                elif not os.path.isfile(local_dir+'Library/'+request) and not bad_request(request):
                     print timestamp()+'No library file found - Looking up data'
                     response = query(request)
                     fileout = open(local_dir+'Library/'+request,'w')
                     fileout.write(response)
                     fileout.close()
+                else:
+                    response = bad_request(request)
     
                 if dev_mode:
                     print response
@@ -785,5 +804,6 @@ try:
         if uptime['hours']>=24:
             uptime['days'] = uptime['days']+1
             uptime['hours'] = 0
-except:
+except Exception,e:
     print 'A fatal exception ocurred'
+    print str(e)

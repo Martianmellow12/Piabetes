@@ -66,4 +66,12 @@ v1.51 (Hedgehog)
 
 v1.52 (Hedgehog)
 	- Fixed the freezing issue after disconnection
+<<<<<<< Updated upstream
 	- Added CrashController.py handling for internal errors
+=======
+	- Added CrashController.py handling for internal errors
+
+v1.53 (Hedgehog)
+	- Removed ability to process foods without a specified amount
+	- Added handling for syntax errors in requests
+>>>>>>> Stashed changes

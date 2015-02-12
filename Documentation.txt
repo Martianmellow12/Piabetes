@@ -1,0 +1,42 @@
+Documentation Of Piabetes Functions
+---------------------------------------
+
+|main.py|
+save_whitelist()
+	- Saves all numbers currently stored in the [whitelist] array to whitelist.nt, the whitelist storage file
+load_whitelist()
+	- Loads the contents of whitelist.nt into the array [whitelist]
+ping()
+	- Tests for an internet connection by attempting to connect to www.google.com
+reformat(text to reformat)
+	- Replaces raw text characters with the characters necessary for the url, such as & and %20
+integrity_check()
+	- Verifies that all of the files that Piabetes needs to run are present
+timestamp()
+	- Returns the date and time formatted in a way that allows it to be appended to a log
+get_update(url of the updated file)
+	- Allows Piabetes to be updated to non-official versions, and is primarily for developers. It has been retired, as automatic updates have been implemented
+get_file(name of the file, url of the file)
+	- Allows files other than main.py to be added to the computer running Piabetes. It has been retired, as updates now unpack from zip files
+processing_led(state to set the light to)
+	- On a Raspberry Pi, this can be used to switch GPIO pin 14 on or off, given that the state is TRUE or FALSE
+power_led(state to set the light to)
+	- On a Raspberry Pi, this can be used to switch GPIO pin 15 on or off, given that the state is TRUE or FALSE
+query(food to query Wolfram Alpha for)
+	- This sends carb and dietary fiber requests to Wolfram Alpha, and returns a completely parsed string ready to be sent to the user
+update_library()
+	- Updates the information stored locally on the copmuter. This occurs on the first of every month at 3:00 AM, or if the user triggers it manually
+parse_command(command to parse)
+	- If a text begins with [--], it is a command. This function processes the command, and incurs whatever function was requested
+
+|Updater.py|
+update_piabetes(information necessary for the update)
+	- Downloads and unpacks the latest version of Piabetes, based on information supplied in the [info] array:
+		info[0] - The version number stored as a float
+		info[1] - The url of the zip file containing the newest version of Piabetes
+
+|Whitelist Backup.py|
+There are no functions defined in this file
+
+|CrashControl.py|
+There are no functions defined in this file
