@@ -15,8 +15,8 @@ whitelist = ['17042306940']
 mode = 'b'
 local_dir = str(os.getcwd())+'/'
 now = datetime.datetime.now()
-version = 'v1.53'
-version_name = 'Hedgehog'
+version = 'v1.6'
+version_name = 'Steadfast'
 online = False
 wolfram_key = str()
 textmagic_key = str()
@@ -760,7 +760,24 @@ try:
                     filein.close
                 elif not os.path.isfile(local_dir+'Library/'+request) and not bad_request(request):
                     print timestamp()+'No library file found - Looking up data'
-                    response = query(request)
+                    success = False
+                    for i in range(0,3):
+                        try:
+                            response = query(request)
+                        except:
+                            print timestamp()+'Couldn\'t contact Wolfram Alpha'
+                            print timestamp()+'Retrying in 10 seconds'
+                            time.sleep(10)
+                        else:
+                            success = True
+                            break
+                    if not success:
+                        print timestamp()+'Failed to contact Wolfram Alpha'
+                        if dev_mode:
+                            print 'Wolfram Exception'
+                        else:
+                            client.send(response,sms_in['messages'][0]['from'])
+                        raise Exception
                     fileout = open(local_dir+'Library/'+request,'w')
                     fileout.write(response)
                     fileout.close()
