@@ -57,6 +57,20 @@ def update_piabetes(info):
             shutil.rmtree(local_dir+i)
     print 'Done'
 
+    #Create Synthetic Config File
+    print 'Creating synthetic configuration file...',
+    try:
+        fileout = open(local_dir+'config.nt','w')
+        fileout.write('[TIME]\n')
+        fileout.write('v'+str(info[0])+'\n')
+        fileout.close()
+    except Exception,e:
+        print 'Failed'
+        print str(e)
+        print 'You will need to enter a default phone number'
+    else:
+        print 'Done'
+
     #Download and unpack the new version
     print 'Downloading v'+str(info[0])+'...',
     try:
