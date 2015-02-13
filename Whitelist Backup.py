@@ -15,7 +15,7 @@ local_dir = str(os.getcwd())+'/'
 #
 #Backup Directory Setup
 print ''
-print '----- Piebetes Whitelist Backup-----'
+print '----- Piabetes Whitelist Backup-----'
 
 if not os.path.isdir(local_dir+'Whitelist Backups/'):
     print '           First Time Setup'
