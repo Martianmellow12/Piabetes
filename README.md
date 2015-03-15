@@ -1,10 +1,10 @@
 <h1>Piabetes</h1>
 <h3>Information Retrieval Software For Diabetics</h3>
 <p>
-This project was designed for my brother, who has type 1 diabetes, but I've released the source here so that anybody can use it. The project was created because whenever we were out and about, we would look up carb information on our phones. Quite often, we would have bad service, and loading 1 page could take 10 minutes. This, combined with having to search repeatedly, made for a long, cold meal. We could usually text, however. This is how Piabetes works. A Raspberry Pi, running at the users home, will be running Piabetes. The user texts a TextMagic number, and Piabetes receives this. It searches Wolfram Alpha for information, and texts it's findings back to the user. This allows the user to get information from the internet, without actually having to connect via 3G or other cellular data service. The whole thing is written in python, making it versatile for non-raspi users. Simply leave it running on a desktop computer that's connected to the internet, and it'll work the same.
+Piabetes is software written to help diabetics get the information they need, even when they don't have an internet connection. By using a computer as an intermediary (RasPi works best, but it's compatible with Windows and OSX), the user can text the name of a food and an amount over SMS (which doesn't require internet on their phone), and receive carbohydrate and dietary fiber information back quickly. This also enables people without smartphones to get this information, as the information is sent as plaintext through SMS. If you have any questions regarding this software, feel free to email me at <a href='mailto:piabetes@gmail.com'>piabetes@gmail.com</a>, or text me at (704) 769-0232.
 </p>
 <hr>
-<h3>About</h3>
+<h3>Sending Requests</h3>
 <p>
 Piabetes sends several pieces of useful information back whenever you request a food. Let's go ahead and dissect one of these messages.
   <ul>
